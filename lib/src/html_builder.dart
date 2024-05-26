@@ -77,19 +77,7 @@ abstract class HTMLBuilder {
     var newCss = relatedCss ?? '';
 
     // ignore: parameter_assignments
-    htmlTemplate = htmlTemplate.replaceFirst('/* other-css */', '''
-      .controls {
-        padding: 20px;
-        position: fixed;
-        top: 25px;
-        left: 25px;
-        z-index: 10;
-        background: rgba(255, 255, 255, 0.8);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-      }
-      $newCss
-    ''');
+    htmlTemplate = htmlTemplate.replaceFirst('/* other-css */', newCss);
     final modelViewerHtml = StringBuffer()
       ..write('<model-viewer id="modelViewer"')
       // Attributes
@@ -399,96 +387,21 @@ abstract class HTMLBuilder {
   <input type="text" id="customText" value="Some text is here in 3D!" />
   <p>Color</p>
   <input type="color" id="colorPicker" value="#ff0000" />
+  <p>Background Color</p>
+  <input type="color" id="backgroundColorPicker" value="#ff0000" />
   <p>Size (Width x Height)</p>
-  <input type="number" id="canvasWidth" value="800" />
+  <input type="number" id="canvasWidth" value="400" />
   <input type="number" id="canvasHeight" value="400" />
   <p>Font Size</p>
-  <input type="number" id="fontSize" value="50" />
+  <input type="number" id="fontSize" value="30" />
   <p>Text X Coordinate</p>
   <input type="number" id="textX" value="0" />
   <p>Text Y Coordinate</p>
-  <input type="number" id="textY" value="400" />
+  <input type="number" id="textY" value="0" />
 </div>
   ''')
-      ..writeln('</model-viewer>')
-      ..writeln('''
-<script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    let canvasTexture = null;
-    let originalTexture = null; // Variable to store the original texture
-
-    const modelViewer = document.getElementById('modelViewer');
-
-    function getCanvasTexture() {
-        if (canvasTexture) return canvasTexture;
-        console.log("Creating new canvas texture");
-        canvasTexture = modelViewer.createCanvasTexture();
-        updateCanvasTexture();
-        return canvasTexture;
-    }
-
-    function updateCanvasTexture() {
-        console.log("Updating canvas texture");
-        const canvas = canvasTexture ? canvasTexture.source.element : document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        const width = parseInt(document.getElementById('canvasWidth').value);
-        const height = parseInt(document.getElementById('canvasHeight').value);
-        const customText = document.getElementById('customText').value;
-        const color = document.getElementById('colorPicker').value;
-        const fontSize = parseInt(document.getElementById('fontSize').value);
-        const textX = parseInt(document.getElementById('textX').value);
-        const textY = parseInt(document.getElementById('textY').value);
-
-        canvas.width = width;
-        canvas.height = height;
-        ctx.clearRect(0, 0, width, height);
-        ctx.font = fontSize + "px sans-serif";
-        ctx.fillStyle = color;
-        ctx.fillText(customText, textX, textY);
-
-        if (canvasTexture) {
-            console.log("Updating canvas texture source");
-            canvasTexture.source.update();
-        }
-    }
-
-    // Add event listeners to update the canvas texture on input changes
-    document.getElementById('customText').addEventListener('input', updateCanvasTexture);
-    document.getElementById('colorPicker').addEventListener('input', updateCanvasTexture);
-    document.getElementById('canvasWidth').addEventListener('input', updateCanvasTexture);
-    document.getElementById('canvasHeight').addEventListener('input', updateCanvasTexture);
-    document.getElementById('fontSize').addEventListener('input', updateCanvasTexture);
-    document.getElementById('textX').addEventListener('input', updateCanvasTexture);
-    document.getElementById('textY').addEventListener('input', updateCanvasTexture);
-
-    modelViewer.addEventListener("load", async () => {
-        console.log("Model viewer loaded");
-        const material = modelViewer.model.materials[0];
-        const { baseColorTexture } = material.pbrMetallicRoughness;
-
-        // Store the original texture
-        originalTexture = baseColorTexture.clone();
-
-        document.querySelector('#type').addEventListener('input', async (event) => {
-            console.log("Texture type changed to:", event.target.value);
-            switch (event.target.value) {
-                case "none":
-                    baseColorTexture.setTexture(originalTexture);
-                    break;
-                case "text":
-                    baseColorTexture.setTexture(getCanvasTexture());
-                    break;
-            }
-        });
-    });
-
-    modelViewer.addEventListener("error", (error) => {
-        ("Model viewer error:", error);
-    });
-});''')
-      // ..write(relatedJs)
-      ..writeln('</script>');
+      ..writeln('</model-viewer>');
+    // ..write(relatedJs)
 
     if (debugLogging ?? false) {
       debugPrint('HTML generated for model_viewer_plus:');
