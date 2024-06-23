@@ -24,7 +24,8 @@
 <!-- body -->
 
 <script>
-    // document.addEventListener('DOMContentLoaded', (event) => {
+    
+    (function() {
         let canvasTexture = null;
         let originalTexture = null; // Variable to store the original texture
     
@@ -104,5 +105,5 @@
         modelViewer.addEventListener("error", (error) => {
             ("Model viewer error:", error);
         });
-    // });
+    })();
 </script>
