@@ -1,3 +1,15 @@
+## 1.8.1
+
+### Changed
+- Update package `web: '>=0.5.0 <2.0.0'`
+
+## 1.8.0
+
+### Changed
+- Upgrade `<model-viewer>` to 3.5.0
+- Updates examples
+- Updates minimum supported SDK version to Flutter 3.22/Dart 3.4
+
 ## 1.7.1
 
 ### Changed
@@ -29,7 +41,7 @@
 
 ### Changed
 - Upgrade dependencies(webview_flutter, android_intent_plus) and align min Flutter SDK to 3.3.0
-- Upgrade <model-viewer> to v3.2.0
+- Upgrade `<model-viewer>` to v3.2.0
 ### Fixed
 - Fix analysis issues
 
