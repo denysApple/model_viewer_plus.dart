@@ -1,3 +1,6 @@
+analyzer:
+  errors:
+    prefer_if_elements_to_conditional_expressions: ignore
 include: package:carapacik_lints/core.yaml
 
 linter:
