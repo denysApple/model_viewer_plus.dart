@@ -78,6 +78,12 @@
     }
   }
 
+  function toggleControlsVisibility() {
+    const controls = document.getElementById('controls_div');
+    const current = controls.style.display;
+    controls.style.display = current === 'none' ? 'block' : 'none';
+  }
+
 
   function updateCanvasTexture() {
     console.log("Updating canvas texture");

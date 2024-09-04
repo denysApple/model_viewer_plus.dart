@@ -25,7 +25,6 @@ dependencies:
   webview_flutter_wkwebview: ^3.13.0
 
 dev_dependencies:
-  carapacik_lints: ^1.8.1
   flutter_test:
     sdk: flutter
 

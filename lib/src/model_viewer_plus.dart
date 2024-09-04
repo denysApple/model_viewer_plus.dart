@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'editor/model_state_store.dart';
 import 'model_viewer_plus_stub.dart'
     if (dart.library.io) 'model_viewer_plus_mobile.dart'
     if (dart.library.js_interop) 'model_viewer_plus_web.dart';
@@ -90,6 +91,7 @@ class ModelViewer extends StatefulWidget {
     this.overwriteNodeValidatorBuilder,
     this.javascriptChannels,
     this.onWebViewCreated,
+    this.modelStateStore,
     super.key,
   });
 
@@ -628,6 +630,8 @@ class ModelViewer extends StatefulWidget {
   ///
   /// Called *after* the logic that initializes the model-viewer.
   final ValueChanged<WebViewController>? onWebViewCreated;
+
+  final ModelStateStore? modelStateStore;
 
   @override
   State<ModelViewer> createState() => ModelViewerState();

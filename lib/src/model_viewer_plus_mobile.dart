@@ -15,18 +15,26 @@ import 'package:webview_flutter_android/webview_flutter_android.dart'
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart'
     as ios;
 
+import 'editor/mobile_model_editor.dart';
 import 'html_builder.dart';
 import 'model_viewer_plus.dart';
 
 class ModelViewerState extends State<ModelViewer> {
   HttpServer? _proxy;
   WebViewController? _webViewController;
+  MobileModelEditor? _modelEditor;
+  final List<StreamSubscription> _subscriptions = [];
+
   late String _proxyURL;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_initProxy().then((_) => _initController()));
+    unawaited(
+      _initProxy()
+          .then((_) => _initController())
+          .then((_) => _subscribeOnUpdates()),
+    );
   }
 
   @override
@@ -34,6 +42,9 @@ class ModelViewerState extends State<ModelViewer> {
     if (_proxy != null) {
       unawaited(_proxy!.close(force: true));
       _proxy = null;
+    }
+    for (final s in _subscriptions) {
+      s.cancel();
     }
     super.dispose();
   }
@@ -216,6 +227,7 @@ class ModelViewerState extends State<ModelViewer> {
     debugPrint('ModelViewer initializing... <$_proxyURL>');
     widget.onWebViewCreated?.call(webViewController);
     await webViewController.loadRequest(Uri.parse(_proxyURL));
+    _modelEditor = MobileModelEditor(webViewController);
     setState(() => _webViewController = webViewController);
   }
 
@@ -314,5 +326,17 @@ class ModelViewerState extends State<ModelViewer> {
 
   Future<Uint8List> _readFile(final String path) async {
     return File(path).readAsBytes();
+  }
+
+  void _subscribeOnUpdates() {
+    final store = widget.modelStateStore;
+    if (store == null) {
+      debugPrint('store is null');
+      return;
+    }
+
+    _subscriptions.addAll([
+      store.toggleControlsStream.listen((_) => _modelEditor?.toggleControlls()),
+    ]);
   }
 }

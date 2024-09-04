@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-import 'editor/model_editor.dart';
+import 'editor/web_model_editor.dart';
 import 'html_builder.dart';
 import 'model_viewer_plus.dart';
 import 'shim/dart_ui_web_fake.dart' if (dart.library.ui_web) 'dart:ui_web'
@@ -13,12 +13,18 @@ import 'shim/dart_web_fake.dart' if (dart.library.js_interop) 'dart:html';
 class ModelViewerState extends State<ModelViewer> {
   bool _isLoading = true;
   final String _uniqueViewType = UniqueKey().toString();
-  final editor = ModelEditor();
+  final _editor = WebModelEditor();
+  final List<StreamSubscription> _subscriptions = [];
 
   @override
   void initState() {
     super.initState();
     unawaited(generateModelViewerHtml());
+    final store = widget.modelStateStore;
+    if (store == null) return;
+    _subscriptions.addAll([
+      store.toggleControlsStream.listen((_) => _editor.toggleControls()),
+    ]);
   }
 
   /// To generate the HTML code for using the model viewer.

@@ -377,7 +377,7 @@ abstract class HTMLBuilder {
     }
     modelViewerHtml
       ..writeln('''
-<div class="controls">
+<div class="controls" style="display: none;" id="controls_div">
   <p>Texture Type</p>
   <select id="type">
     <option value="none">None</option>
