@@ -51,25 +51,13 @@ class ModelViewerState extends State<ModelViewer> {
 
   @override
   Widget build(final BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    semanticsLabel: 'Loading Model Viewer...',
-                  ),
-                )
-              : HtmlElementView(viewType: 'model-viewer-html-$_uniqueViewType'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            editor.test();
-          },
-          child: const Text('Test'),
-        ),
-      ],
-    );
+    return _isLoading
+        ? const Center(
+            child: CircularProgressIndicator(
+              semanticsLabel: 'Loading Model Viewer...',
+            ),
+          )
+        : HtmlElementView(viewType: 'model-viewer-html-$_uniqueViewType');
   }
 
   String _buildHTML(final String htmlTemplate) {
