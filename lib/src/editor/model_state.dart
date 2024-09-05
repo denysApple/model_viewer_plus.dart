@@ -11,6 +11,12 @@
 
 import 'package:flutter/material.dart';
 
+enum TextureType {
+  none,
+  text,
+  ;
+}
+
 class ModelState {
   ModelState({
     this.width,
@@ -19,7 +25,9 @@ class ModelState {
     this.color,
     this.backgroundColor,
     this.fontSize,
-    this.textOffset,
+    this.textX,
+    this.textY,
+    this.textureType,
   });
 
   final int? width;
@@ -27,6 +35,31 @@ class ModelState {
   final String? customText;
   final Color? color;
   final Color? backgroundColor;
-  final double? fontSize;
-  final Offset? textOffset;
+  final int? fontSize;
+  final int? textX;
+  final int? textY;
+  final TextureType? textureType;
+
+  ModelState copyWith({
+    int? width,
+    int? height,
+    String? customText,
+    Color? color,
+    Color? backgroundColor,
+    int? fontSize,
+    TextureType? textureType,
+    int? textX,
+    int? textY,
+  }) =>
+      ModelState(
+        width: width ?? this.width,
+        height: height ?? this.height,
+        customText: customText ?? this.customText,
+        color: color ?? this.color,
+        backgroundColor: backgroundColor ?? this.backgroundColor,
+        fontSize: fontSize ?? this.fontSize,
+        textureType: textureType ?? this.textureType,
+        textX: textX ?? this.textX,
+        textY: textY ?? this.textY,
+      );
 }

@@ -337,6 +337,7 @@ class ModelViewerState extends State<ModelViewer> {
 
     _subscriptions.addAll([
       store.toggleControlsStream.listen((_) => _modelEditor?.toggleControlls()),
+      store.state.listen((newState) => _modelEditor?.updateState(newState)),
     ]);
   }
 }

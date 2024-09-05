@@ -37,12 +37,17 @@
     return canvasTexture;
   }
 
-  function updateBackroundColor() {
-    console.log("callign update background color");
-
-  }
-
-  function updateCanvasTexture1(width, height, customText, color, backgroundColor, fontSize, textX, textY) {
+  function updateCanvasTexture1(
+    width,
+    height,
+    customText,
+    color,
+    backgroundColor,
+    fontSize,
+    textX,
+    textY,
+    texture,
+  ) {
     console.log("Updating canvas texture 1");
     console.log("Received parameters:", {
       width: width,
@@ -59,23 +64,46 @@
     const ctx = canvas.getContext('2d');
 
     // Set canvas dimensions
-    canvas.width = width;
-    canvas.height = height;
+    if (width) canvas.width = width;
+    if (height) canvas.height = height;
 
     // Set the background color
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, width, height); // Draw the background
+    if (backgroundColor) ctx.fillStyle = backgroundColor;
+    if (width && height) ctx.fillRect(0, 0, width, height); // Draw the background
 
     // Set the text properties
-    ctx.font = fontSize + "px sans-serif";
-    ctx.fillStyle = color;
+    if (fontSize) ctx.font = fontSize + "px sans-serif";
+    if (color) ctx.fillStyle = color;
     ctx.fillText(customText, textX, textY);
+    if (texture) updateTexture(texture);
 
     // Update the canvas texture if it exists
     if (canvasTexture) {
-      console.log("Updating canvas texture source");
+      console.log("Updating canvas texture source 1");
       canvasTexture.source.update();
     }
+  }
+
+  function updateTexture(texture) {
+    const material = modelViewer.model.materials[0];
+    const { baseColorTexture } = material.pbrMetallicRoughness;
+
+    // Store the original texture
+    if (originalTexture === null) {
+      console.log("keep original texture");
+      originalTexture = baseColorTexture;
+    }
+
+    console.log("Texture type changed to:", texture);
+    switch (event.target.value) {
+      case "none":
+        baseColorTexture.setTexture(originalTexture);
+        break;
+      case "text":
+        baseColorTexture.setTexture(getCanvasTexture());
+        break;
+    }
+
   }
 
   function toggleControlsVisibility() {
