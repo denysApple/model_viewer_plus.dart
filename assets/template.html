@@ -7,18 +7,6 @@
         margin: 0;
         padding: 0;
     }
-
-    .controls {
-        padding: 20px;
-        position: fixed;
-        top: 25px;
-        left: 25px;
-        z-index: 10;
-        background: rgba(255, 255, 255, 0.8);
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-      }
-    /* other-css */
 </style>
 <script type="module" src="model-viewer.min.js" defer></script>
 <!-- body -->
@@ -26,7 +14,6 @@
 <script>
   let canvasTexture = null;
   let originalTexture = null; // Variable to store the original texture
-
   let modelViewer = null;
 
   function getCanvasTexture() {
@@ -46,38 +33,30 @@
     fontSize,
     textX,
     textY,
-    texture,
+    texture
   ) {
     console.log("Updating canvas texture 1");
     console.log("Received parameters:", {
-      width: width,
-      height: height,
-      customText: customText,
-      color: color,
-      backgroundColor: backgroundColor,
-      fontSize: fontSize,
-      textX: textX,
-      textY: textY
+      width, height, customText, color, backgroundColor, fontSize, textX, textY
     });
 
     const canvas = canvasTexture ? canvasTexture.source.element : document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    // Set canvas dimensions
-    if (width) canvas.width = width;
-    if (height) canvas.height = height;
+    canvas.width = width || canvas.width;
+    canvas.height = height || canvas.height;
 
-    // Set the background color
-    if (backgroundColor) ctx.fillStyle = backgroundColor;
-    if (width && height) ctx.fillRect(0, 0, width, height); // Draw the background
+    if (backgroundColor) {
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
-    // Set the text properties
-    if (fontSize) ctx.font = fontSize + "px sans-serif";
+    if (fontSize) ctx.font = `${fontSize}px sans-serif`;
     if (color) ctx.fillStyle = color;
     ctx.fillText(customText, textX, textY);
+
     if (texture) updateTexture(texture);
 
-    // Update the canvas texture if it exists
     if (canvasTexture) {
       console.log("Updating canvas texture source 1");
       canvasTexture.source.update();
@@ -95,7 +74,7 @@
     }
 
     console.log("Texture type changed to:", texture);
-    switch (event.target.value) {
+    switch (texture) {
       case "none":
         baseColorTexture.setTexture(originalTexture);
         break;
@@ -106,92 +85,20 @@
 
   }
 
-  function toggleControlsVisibility() {
-    const controls = document.getElementById('controls_div');
-    const current = controls.style.display;
-    controls.style.display = current === 'none' ? 'block' : 'none';
-  }
-
-
-  function updateCanvasTexture() {
-    console.log("Updating canvas texture");
-    const canvas = canvasTexture ? canvasTexture.source.element : document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    const width = parseInt(document.getElementById('canvasWidth').value);
-    const height = parseInt(document.getElementById('canvasHeight').value);
-    const customText = document.getElementById('customText').value;
-    const color = document.getElementById('colorPicker').value;
-    const backgroundColor = document.getElementById('backgroundColorPicker').value;
-    const fontSize = parseInt(document.getElementById('fontSize').value);
-    const textX = parseInt(document.getElementById('textX').value);
-    const textY = parseInt(document.getElementById('textY').value);
-    console.log("Received parameters:", {
-      width: width,
-      height: height,
-      customText: customText,
-      color: color,
-      backgroundColor: backgroundColor,
-      fontSize: fontSize,
-      textX: textX,
-      textY: textY
-    });
-    canvas.width = width;
-    canvas.height = height;
-
-    // Set the background color
-    ctx.fillStyle = backgroundColor;  // Use the selected background color
-    ctx.fillRect(0, 0, width, height); // Draw the background
-
-    ctx.font = fontSize + "px sans-serif";
-    ctx.fillStyle = color;
-    ctx.baseColorTexture = backgroundColor;
-    ctx.fillText(customText, textX, textY);
-
-    if (canvasTexture) {
-      console.log("Updating canvas texture source");
-      canvasTexture.source.update();
-    }
-  }
-
-  (function() {
-
-
+  document.addEventListener('DOMContentLoaded', () => {
     modelViewer = document.getElementById('modelViewer');
 
-    // Add event listeners to update the canvas texture on input changes
-    document.getElementById('customText').addEventListener('input', updateCanvasTexture);
-    document.getElementById('colorPicker').addEventListener('input', updateCanvasTexture);
-    document.getElementById('backgroundColorPicker').addEventListener('input', updateCanvasTexture);
-    document.getElementById('canvasWidth').addEventListener('input', updateCanvasTexture);
-    document.getElementById('canvasHeight').addEventListener('input', updateCanvasTexture);
-    document.getElementById('fontSize').addEventListener('input', updateCanvasTexture);
-    document.getElementById('textX').addEventListener('input', updateCanvasTexture);
-    document.getElementById('textY').addEventListener('input', updateCanvasTexture);
 
     modelViewer.addEventListener("load", async () => {
       console.log("Model viewer loaded");
       const material = modelViewer.model.materials[0];
       const { baseColorTexture } = material.pbrMetallicRoughness;
 
-      // Store the original texture
       originalTexture = baseColorTexture;
-
-      document.querySelector('#type').addEventListener('input', async (event) => {
-        console.log("Texture type changed to:", event.target.value);
-        switch (event.target.value) {
-          case "none":
-            baseColorTexture.setTexture(originalTexture);
-            break;
-          case "text":
-            baseColorTexture.setTexture(getCanvasTexture());
-            break;
-        }
-      });
     });
 
     modelViewer.addEventListener("error", (error) => {
-      ("Model viewer error:", error);
+      console.error("Model viewer error:", error);
     });
-  })();
+  });
 </script>

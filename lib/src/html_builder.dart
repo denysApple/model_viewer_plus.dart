@@ -375,33 +375,6 @@ abstract class HTMLBuilder {
     if (innerModelViewerHtml != null) {
       modelViewerHtml.writeln(innerModelViewerHtml);
     }
-    modelViewerHtml
-      ..writeln('''
-<div class="controls" style="display: none;" id="controls_div">
-  <p>Texture Type</p>
-  <select id="type">
-    <option value="none">None</option>
-    <option value="text">Text</option>
-  </select>
-  <p>Custom Text</p>
-  <input type="text" id="customText" value="Some text is here in 3D!" />
-  <p>Color</p>
-  <input type="color" id="colorPicker" value="#ff0000" />
-  <p>Background Color</p>
-  <input type="color" id="backgroundColorPicker" value="#ff0000" />
-  <p>Size (Width x Height)</p>
-  <input type="number" id="canvasWidth" value="400" />
-  <input type="number" id="canvasHeight" value="400" />
-  <p>Font Size</p>
-  <input type="number" id="fontSize" value="30" />
-  <p>Text X Coordinate</p>
-  <input type="number" id="textX" value="0" />
-  <p>Text Y Coordinate</p>
-  <input type="number" id="textY" value="0" />
-</div>
-  ''')
-      ..writeln('</model-viewer>');
-    // ..write(relatedJs)
 
     if (debugLogging ?? false) {
       debugPrint('HTML generated for model_viewer_plus:');
