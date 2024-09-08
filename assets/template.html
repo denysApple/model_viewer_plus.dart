@@ -85,20 +85,48 @@
 
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initializeModelViewer() {
+    console.log("Initializing Model Viewer");
+
     modelViewer = document.getElementById('modelViewer');
 
+    if (!modelViewer) {
+      console.error("Model viewer element not found");
+      return;
+    }
 
     modelViewer.addEventListener("load", async () => {
       console.log("Model viewer loaded");
       const material = modelViewer.model.materials[0];
       const { baseColorTexture } = material.pbrMetallicRoughness;
 
+      // Store the original texture
       originalTexture = baseColorTexture;
+
+      // Initialize canvas texture
+      canvasTexture = modelViewer.createCanvasTexture();
+
+      // You might want to call an initial texture update here
+      // updateCanvasTexture();
     });
 
     modelViewer.addEventListener("error", (error) => {
       console.error("Model viewer error:", error);
     });
-  });
+  }
+
+  
+  // This function will attempt to initialize as soon as possible
+  function tryInitialize() {
+    if (document.readyState === 'loading') {
+      // DOM not ready, add event listener
+      document.addEventListener('DOMContentLoaded', initializeModelViewer);
+    } else {
+      // DOM is ready, call the function directly
+      initializeModelViewer();
+    }
+  }
+
+  // Call tryInitialize immediately
+  tryInitialize();
 </script>
