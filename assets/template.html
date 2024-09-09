@@ -51,9 +51,22 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    if (fontSize) ctx.font = `${fontSize}px sans-serif`;
-    if (color) ctx.fillStyle = color;
-    ctx.fillText(customText, textX, textY);
+    // Only proceed with text rendering if customText is provided
+    if (customText != null) {
+      // Set the text properties
+      ctx.font = `${fontSize || 24}px Arial, sans-serif`;  // Default font size to 24 if null
+      ctx.fillStyle = color || '#000000';  // Default color to black if null
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+
+      // Calculate text position
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      console.log("setting custom text: " + customText);
+
+      // Apply text, defaulting offsets to 0 if null
+      ctx.fillText(customText, centerX + (textX || 0), centerY + (textY || 0));
+    }
 
     if (texture) updateTexture(texture);
 

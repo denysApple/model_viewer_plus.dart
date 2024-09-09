@@ -23,7 +23,6 @@ class ModelViewerState extends State<ModelViewer> {
     final store = widget.modelStateStore;
     if (store == null) return;
     _subscriptions.addAll([
-      store.toggleControlsStream.listen((_) => _editor.toggleControls()),
       store.state.listen((newState) => _editor.updateState(newState)),
     ]);
   }

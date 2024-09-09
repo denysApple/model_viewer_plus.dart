@@ -31,7 +31,7 @@ class MobileModelEditor {
     updateCanvasTexture1(
     $width,
     $height,
-    $customText,
+    "$customText",
     $color,
     $backgroundColor,
     $fontSize,

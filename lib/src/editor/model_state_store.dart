@@ -1,15 +1,14 @@
 import 'dart:async';
 
+import 'package:rxdart/subjects.dart';
+
 import 'model_state.dart';
 
 class ModelStateStore {
   ModelState currentState = ModelState();
 
-  final _stateController = StreamController<ModelState>.broadcast();
+  final _stateController = BehaviorSubject<ModelState>();
   Stream<ModelState> get state => _stateController.stream;
-
-  final _toggleControlsController = StreamController<dynamic>.broadcast();
-  Stream<dynamic> get toggleControlsStream => _toggleControlsController.stream;
 
   void updateState(
     ModelState Function(ModelState) producer,
@@ -19,12 +18,7 @@ class ModelStateStore {
     _stateController.sink.add(newState);
   }
 
-  void toggleControlls() {
-    _toggleControlsController.add('');
-  }
-
   void dispose() {
     _stateController.close();
-    _toggleControlsController.close();
   }
 }
