@@ -19,8 +19,6 @@ enum TextureType {
 
 class ModelState {
   ModelState({
-    this.width,
-    this.height,
     this.customText,
     this.color,
     this.backgroundColor,
@@ -30,8 +28,6 @@ class ModelState {
     this.textureType,
   });
 
-  final int? width;
-  final int? height;
   final String? customText;
   final Color? color;
   final Color? backgroundColor;
@@ -41,8 +37,6 @@ class ModelState {
   final TextureType? textureType;
 
   ModelState copyWith({
-    int? width,
-    int? height,
     String? customText,
     Color? color,
     Color? backgroundColor,
@@ -52,8 +46,6 @@ class ModelState {
     int? textY,
   }) =>
       ModelState(
-        width: width ?? this.width,
-        height: height ?? this.height,
         customText: customText ?? this.customText,
         color: color ?? this.color,
         backgroundColor: backgroundColor ?? this.backgroundColor,

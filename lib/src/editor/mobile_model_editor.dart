@@ -13,8 +13,6 @@ class MobileModelEditor {
 
   void updateState(ModelState state) {
     print("updating state");
-    final width = state.width;
-    final height = state.height;
     final customText = state.customText;
     final color = state.color != null ? '"${state.color?.toHex()}"' : null;
     final backgroundColor = state.backgroundColor != null
@@ -29,8 +27,6 @@ class MobileModelEditor {
     };
     final jsMethod = """
     updateCanvasTexture1(
-    $width,
-    $height,
     "$customText",
     $color,
     $backgroundColor,

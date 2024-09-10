@@ -8,8 +8,6 @@ import '../util/hex_color.dart';
 
 @JS()
 external void updateCanvasTexture1(
-  int? width,
-  int? height,
   String? customText,
   String? color,
   String? backgroundColor,
@@ -29,8 +27,6 @@ class WebModelEditor {
 
   void updateState(ModelState state) {
     updateCanvasTexture1(
-      state.width,
-      state.height,
       state.customText,
       state.color?.toHex(),
       state.backgroundColor?.toHex(),
