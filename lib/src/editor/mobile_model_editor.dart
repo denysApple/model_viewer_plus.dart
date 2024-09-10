@@ -27,7 +27,7 @@ class MobileModelEditor {
     };
     final jsMethod = """
     updateCanvasTexture1(
-    "$customText",
+    ${customText != null ? "$customText" : null},
     $color,
     $backgroundColor,
     $fontSize,
