@@ -18,7 +18,7 @@
 
   function getCanvasTexture() {
     if (canvasTexture) return canvasTexture;
-    console.log("Creating new canvas texture");
+    debugLog("Creating new canvas texture");
     canvasTexture = modelViewer.createCanvasTexture();
     updateCanvasTexture();
     return canvasTexture;
@@ -33,8 +33,8 @@
     textY,
     texture
   ) {
-    console.log("Updating canvas texture 1");
-    console.log("Received parameters:", {
+    debugLog("Updating canvas texture 1");
+    debugLog("Received parameters:", {
       customText, color, backgroundColor, fontSize, textX, textY
     });
 
@@ -57,7 +57,7 @@
       // Calculate text position
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      console.log("setting custom text: " + customText);
+      debugLog("setting custom text: " + customText);
 
       // Apply text, defaulting offsets to 0 if null
       ctx.fillText(customText, centerX + (textX || 0), centerY + (textY || 0));
@@ -66,7 +66,7 @@
     if (texture) updateTexture(texture);
 
     if (canvasTexture) {
-      console.log("Updating canvas texture source 1");
+      debugLog("Updating canvas texture source 1");
       canvasTexture.source.update();
     }
   }
@@ -77,11 +77,11 @@
 
     // Store the original texture
     if (originalTexture === null) {
-      console.log("keep original texture");
+      debugLog("keep original texture");
       originalTexture = baseColorTexture;
     }
 
-    console.log("Texture type changed to:", texture);
+    debugLog("Texture type changed to:", texture);
     switch (texture) {
       case "none":
         baseColorTexture.setTexture(originalTexture);
@@ -94,7 +94,7 @@
   }
 
   function initializeModelViewer() {
-    console.log("Initializing Model Viewer");
+    debugLog("Initializing Model Viewer");
 
     modelViewer = document.getElementById('modelViewer');
 
@@ -104,7 +104,7 @@
     }
 
     modelViewer.addEventListener("load", async () => {
-      console.log("Model viewer loaded");
+      debugLog("Model viewer loaded");
       const material = modelViewer.model.materials[0];
       const { baseColorTexture } = material.pbrMetallicRoughness;
 
@@ -136,5 +136,10 @@
   }
 
   // Call tryInitialize immediately
+  debugLog("Calling tryInitialize");
   tryInitialize();
+
+  function debugLog(any) {
+      Print.postMessage(any);
+  }
 </script>
