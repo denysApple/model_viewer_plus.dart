@@ -46,10 +46,33 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
+    
+    const modelInfo = analyzeModel();
+    const suggestedSettings = suggestTextureSettings(modelInfo);
+
+    console.log("Suggested settings:", suggestedSettings);
+
     // Only proceed with text rendering if customText is provided
     if (customText != null) {
-      // Set the text properties
-      ctx.font = `${fontSize || 24}px Arial, sans-serif`;  // Default font size to 24 if null
+      ctx.save();
+      // Move to the center of the canvas
+      // ctx.translate(canvas.width / 2 - 90, canvas.height / 2 - 15);
+
+      // // Rotate the context
+      // // ctx.rotate(180 * Math.PI / 180); // Convert degrees to radians
+      // ctx.scale(1, -1); // Flip the text
+
+      // Use suggested settings for positioning
+      ctx.translate(
+        suggestedSettings.offsetX + (suggestedSettings.width / 2), 
+        suggestedSettings.offsetY + (suggestedSettings.height / 2)
+      );
+      ctx.scale(suggestedSettings.scaleX, suggestedSettings.scaleY);
+
+      // Adjust font size based on the scale
+      const adjustedFontSize = (fontSize || 24) / suggestedSettings.scaleX;
+
+      ctx.font = `${adjustedFontSize}px Arial, sans-serif`;
       ctx.fillStyle = color || '#000000';  // Default color to black if null
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
@@ -60,7 +83,8 @@
       console.log("setting custom text: " + customText);
 
       // Apply text, defaulting offsets to 0 if null
-      ctx.fillText(customText, centerX + (textX || 0), centerY + (textY || 0));
+      ctx.fillText(customText,  (textX || 0),  (textY || 0));
+      ctx.restore();
     }
 
     if (texture) updateTexture(texture);
@@ -114,8 +138,8 @@
       // Initialize canvas texture
       canvasTexture = modelViewer.createCanvasTexture();
 
-      // You might want to call an initial texture update here
-      // updateCanvasTexture();
+      // Analyze the model after it's loaded
+      analyzeModel();
     });
 
     modelViewer.addEventListener("error", (error) => {
@@ -133,6 +157,87 @@
       // DOM is ready, call the function directly
       initializeModelViewer();
     }
+  }
+  function analyzeModel() {
+    if (!modelViewer || !modelViewer.model) {
+      console.error("Model not loaded");
+      return null;
+    }
+
+    const modelInfo = {
+      dimensions: getModelDimensions(),
+      materials: getModelMaterials(),
+      uvBounds: getUVBounds()
+    };
+
+    console.log("Model analysis result:", modelInfo);
+    suggestTextureSettings(modelInfo);
+    return modelInfo;
+  }
+
+  function getModelDimensions() {
+    const boundingBox = modelViewer.getBoundingBoxCenter();
+    const size = modelViewer.getDimensions();
+    return {
+      width: size.x,
+      height: size.y,
+      depth: size.z,
+      center: boundingBox
+    };
+  }
+
+  function getModelMaterials() {
+    const materials = [];
+    if (modelViewer.model && modelViewer.model.materials) {
+      modelViewer.model.materials.forEach((material, index) => {
+        if (material.pbrMetallicRoughness && material.pbrMetallicRoughness.baseColorTexture) {
+          const texture = material.pbrMetallicRoughness.baseColorTexture.texture;
+          materials.push({
+            name: material.name || `Material_${index}`,
+            textureSize: {
+              width: texture.source.width,
+              height: texture.source.height
+            }
+          });
+        }
+      });
+    }
+    return materials;
+  }
+
+  function getUVBounds() {
+    // Unfortunately, we can't easily get UV bounds without access to Three.js internals
+    // We'll return null here, and adjust our logic accordingly
+    return null;
+  }
+
+  function suggestTextureSettings(modelInfo) {
+    if (!modelInfo) return null;
+
+    const materials = modelInfo.materials;
+    const dimensions = modelInfo.dimensions;
+
+    // Assuming the first material is the main texture
+    const mainTexture = materials[0]?.textureSize;
+
+    if (!mainTexture || !dimensions) {
+      console.warn("Not enough information to suggest texture settings");
+      return null;
+    }
+
+    // Since we don't have UV information, we'll make some assumptions
+    // We'll assume the texture should be centered on the front face of the model
+    const suggestedSettings = {
+      offsetX: 0, // Centered horizontally
+      offsetY: 0, // Centered vertically
+      scaleX: 1,
+      scaleY: 1,
+      width: Math.min(mainTexture.width, dimensions.width),
+      height: Math.min(mainTexture.height, dimensions.height)
+    };
+
+    console.log("Suggested texture settings:", suggestedSettings);
+    return suggestedSettings;
   }
 
   // Call tryInitialize immediately
