@@ -7,12 +7,7 @@ class MobileModelEditor {
 
   final WebViewController _controller;
 
-  void toggleControlls() {
-    _controller.runJavaScript('toggleControlsVisibility()');
-  }
-
   void updateState(ModelState state) {
-    print("updating state");
     final customText = state.customText;
     final color = state.color != null ? '"${state.color?.toHex()}"' : null;
     final backgroundColor = state.backgroundColor != null
@@ -25,6 +20,7 @@ class MobileModelEditor {
       TextureType.text => '\"text\"',
       _ => '"none"',
     };
+    final rotation = state.rotation;
     final jsMethod = """
     updateCanvasTexture1(
     "${customText ?? ''}",
@@ -33,7 +29,8 @@ class MobileModelEditor {
     $fontSize,
     $textX,
     $textY,
-    $texture
+    $texture,
+    $rotation
     )
     """;
     print("js: $jsMethod");

@@ -31,13 +31,9 @@
     fontSize,
     textX,
     textY,
-    texture
+    texture,
+    rotation
   ) {
-    console.log("Updating canvas texture 1");
-    console.log("Received parameters:", {
-      customText, color, backgroundColor, fontSize, textX, textY
-    });
-
     const canvas = canvasTexture ? canvasTexture.source.element : document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
@@ -55,36 +51,34 @@
     // Only proceed with text rendering if customText is provided
     if (customText != null) {
       ctx.save();
-      // Move to the center of the canvas
-      // ctx.translate(canvas.width / 2 - 90, canvas.height / 2 - 15);
 
-      // // Rotate the context
-      // // ctx.rotate(180 * Math.PI / 180); // Convert degrees to radians
-      // ctx.scale(1, -1); // Flip the text
-
-      // Use suggested settings for positioning
+      // Move to the center of the text area
       ctx.translate(
         suggestedSettings.offsetX + (suggestedSettings.width / 2), 
         suggestedSettings.offsetY + (suggestedSettings.height / 2)
       );
+
+      // Apply rotation
+      ctx.rotate(rotation * Math.PI / 180);
+
+      // Apply scaling
       ctx.scale(suggestedSettings.scaleX, suggestedSettings.scaleY);
 
+
       // Adjust font size based on the scale
-      const adjustedFontSize = (fontSize || 24) / suggestedSettings.scaleX;
+      const adjustedFontSize = (fontSize || 24) / Math.abs(suggestedSettings.scaleX);
 
       ctx.font = `${adjustedFontSize}px Arial, sans-serif`;
-      ctx.fillStyle = color || '#000000';  // Default color to black if null
+      ctx.fillStyle = color || '#000000';
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
 
-      // Calculate text position
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
       console.log("setting custom text: " + customText);
 
-      // Apply text, defaulting offsets to 0 if null
-      ctx.fillText(customText,  (textX || 0),  (textY || 0));
+      // Draw text at (0, 0) since we've already translated to the center
+      ctx.fillText(customText, textX || 0, textY || 0);
       ctx.restore();
+
     }
 
     if (texture) updateTexture(texture);
@@ -206,9 +200,37 @@
   }
 
   function getUVBounds() {
-    // Unfortunately, we can't easily get UV bounds without access to Three.js internals
-    // We'll return null here, and adjust our logic accordingly
-    return null;
+    // const threeScene = modelViewer.scene;
+    // const meshes = [];
+    //
+    // threeScene.traverse((child) => {
+    //   if (child.isMesh) {
+    //     meshes.push(child);
+    //   }
+    // });
+    //
+    // const mesh = meshes[0]; // Assuming the first mesh is the T-shirt
+    // const uvAttribute = mesh.geometry.attributes.uv;
+    //
+    // if (uvAttribute) {
+    //   const uvs = uvAttribute.array;
+    //   let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+    //
+    //   for (let i = 0; i < uvs.length; i += 2) {
+    //     const u = uvs[i];
+    //     const v = uvs[i + 1];
+    //
+    //     minU = Math.min(minU, u);
+    //     maxU = Math.max(maxU, u);
+    //     minV = Math.min(minV, v);
+    //     maxV = Math.max(maxV, v);
+    //   }
+    //
+    //   return { minU, maxU, minV, maxV };
+    // } else {
+    //   console.warn("UV attributes not found");
+    //   return null;
+    // }
   }
 
   function suggestTextureSettings(modelInfo) {
