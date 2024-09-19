@@ -50,34 +50,49 @@
 
     // Only proceed with text rendering if customText is provided
     if (customText != null) {
+      
       ctx.save();
-
-      // Move to the center of the text area
-      ctx.translate(
-        suggestedSettings.offsetX + (suggestedSettings.width / 2), 
-        suggestedSettings.offsetY + (suggestedSettings.height / 2)
-      );
-
-      // Apply rotation
-      ctx.rotate(rotation * Math.PI / 180);
 
       // Apply scaling
       ctx.scale(suggestedSettings.scaleX, suggestedSettings.scaleY);
 
-
-      // Adjust font size based on the scale
+      // Set font properties before measuring
       const adjustedFontSize = (fontSize || 24) / Math.abs(suggestedSettings.scaleX);
-
       ctx.font = `${adjustedFontSize}px Arial, sans-serif`;
+
+      // Measure text dimensions
+      const textMetrics = ctx.measureText(customText);
+      const textWidth = textMetrics.width;
+      const textHeight = adjustedFontSize; // Approximate height based on font size
+
+      // Calculate the position where the text should be placed
+      const posX = suggestedSettings.offsetX + (textX || 0);
+      const posY = suggestedSettings.offsetY + (textY || 0);
+
+      // Move to the desired position
+      ctx.translate(posX, posY);
+
+      // Move to the center of the text
+      ctx.translate(textWidth / 2, textHeight / 2);
+
+      // Apply rotation
+      ctx.rotate((rotation || 0) * Math.PI / 180);
+
+      // Move back to the top-left corner of the text
+      ctx.translate(-textWidth / 2, -textHeight / 2);
+
+      // Set text alignment and baseline
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      // Set fill style
       ctx.fillStyle = color || '#000000';
-      ctx.textBaseline = 'middle';
-      ctx.textAlign = 'center';
 
-      console.log("setting custom text: " + customText);
+      // Draw the text at (0, 0)
+      ctx.fillText(customText, 0, 0);
 
-      // Draw text at (0, 0) since we've already translated to the center
-      ctx.fillText(customText, textX || 0, textY || 0);
       ctx.restore();
+
 
     }
 
