@@ -23,7 +23,7 @@
     if (canvasTexture) return canvasTexture;
     console.log("Creating new canvas texture");
     canvasTexture = modelViewer.createCanvasTexture();
-    updateCanvasTexture();
+    updateCanvasTexture1();
     return canvasTexture;
   }
 
@@ -123,7 +123,7 @@
     console.log("Texture type changed to:", texture);
     switch (texture) {
       case "none":
-        baseColorTexture.setTexture(originalTexture);
+        baseColorTexture.setTexture(null);
         break;
       case "text":
         baseColorTexture.setTexture(getCanvasTexture());
@@ -242,13 +242,15 @@
       modelViewer.model.materials.forEach((material, index) => {
         if (material.pbrMetallicRoughness && material.pbrMetallicRoughness.baseColorTexture) {
           const texture = material.pbrMetallicRoughness.baseColorTexture.texture;
-          materials.push({
-            name: material.name || `Material_${index}`,
-            textureSize: {
-              width: texture.source.width,
-              height: texture.source.height
-            }
-          });
+          if (texture) {
+            materials.push({
+              name: material.name || `Material_${index}`,
+              textureSize: {
+                width: texture.source.width,
+                height: texture.source.height
+              }
+            });
+          }
         }
       });
     }
