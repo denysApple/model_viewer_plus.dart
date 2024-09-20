@@ -70,10 +70,13 @@
       const posY = suggestedSettings.offsetY + (textY || 0);
 
       // Move to the desired position
-      ctx.translate(posX, posY);
+      ctx.translate(posX + 46, posY + 46);
 
       // Move to the center of the text
       ctx.translate(textWidth / 2, textHeight / 2);
+
+      //flip vertically 
+      ctx.scale(1, -1);
 
       // Apply rotation
       ctx.rotate((rotation || 0) * Math.PI / 180);
