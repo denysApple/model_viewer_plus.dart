@@ -15,6 +15,9 @@
   let canvasTexture = null;
   let originalTexture = null; // Variable to store the original texture
   let modelViewer = null;
+  
+  let bgColorDefault = "#ffffff";
+  let textColorDefault = "#000000";
 
   function getCanvasTexture() {
     if (canvasTexture) return canvasTexture;
@@ -37,10 +40,8 @@
     const canvas = canvasTexture ? canvasTexture.source.element : document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    if (backgroundColor) {
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
+    ctx.fillStyle = backgroundColor || bgColorDefault;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     
     const modelInfo = analyzeModel();
@@ -70,10 +71,7 @@
       const posY = suggestedSettings.offsetY + (textY || 0);
 
       // Move to the desired position
-      ctx.translate(posX + 46, posY + 46);
-
-      // Move to the center of the text
-      ctx.translate(textWidth / 2, textHeight / 2);
+      ctx.translate(posX + 46 + textWidth / 2, posY + 46);
 
       //flip vertically 
       ctx.scale(1, -1);
@@ -81,15 +79,12 @@
       // Apply rotation
       ctx.rotate((rotation || 0) * Math.PI / 180);
 
-      // Move back to the top-left corner of the text
-      ctx.translate(-textWidth / 2, -textHeight / 2);
-
       // Set text alignment and baseline
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
       // Set fill style
-      ctx.fillStyle = color || '#000000';
+      ctx.fillStyle = color || textColorDefault;
 
       // Draw the text at (0, 0)
       ctx.fillText(customText, 0, 0);
