@@ -18,6 +18,9 @@
   
   let bgColorDefault = "#ffffff";
   let textColorDefault = "#000000";
+  const defaultImageWidth = 100;
+  const defaultImageHeight = 100;
+  const imageId = "image-print";
 
   function getCanvasTexture() {
     if (canvasTexture) return canvasTexture;
@@ -44,16 +47,56 @@
     ctx.fillStyle = backgroundColor || bgColorDefault;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Only proceed with text rendering if customText is provided
-    if (customText != null) {
-      drawText(canvas, customText, color, fontSize, textX, textY, rotation);
-    }
+    if (imageSrc) {
+      const image = new Image(defaultImageWidth, defaultImageHeight);
+      // set image id
+      image.id = imageId;
+      image.onload = function() {
+        ctx.save();
+        const dX = 35 * (canvas.width / 512);
+        const dY = 86 * (canvas.height / 512);
+        const startX = dX - defaultImageWidth / 2;
+        const startY = dY - defaultImageHeight / 2;
+        ctx.drawImage(image, startX, startY, defaultImageWidth, defaultImageHeight);
+        ctx.restore();
 
-    if (texture) updateTexture(texture);
+        if (customText != null) {
+          drawText(canvas, customText, color, fontSize, textX, textY, rotation);
+        }
 
-    if (canvasTexture) {
-      console.log("Updating canvas texture source 1");
-      canvasTexture.source.update();
+        if (texture) updateTexture(texture);
+
+        if (canvasTexture) {
+          console.log("Updating canvas texture source 1");
+          canvasTexture.source.update();
+        }
+
+      }
+      image.onerror = function() {
+        console.error("Image load error");
+        if (customText != null) {
+          drawText(canvas, customText, color, fontSize, textX, textY, rotation);
+        }
+
+        if (texture) updateTexture(texture);
+
+        if (canvasTexture) {
+          console.log("Updating canvas texture source 1");
+          canvasTexture.source.update();
+        }
+      }
+      image.src = imageSrc;
+    } else {
+      if (customText != null) {
+        drawText(canvas, customText, color, fontSize, textX, textY, rotation);
+      }
+
+      if (texture) updateTexture(texture);
+
+      if (canvasTexture) {
+        console.log("Updating canvas texture source 1");
+        canvasTexture.source.update();
+      }
     }
   }
 
@@ -103,6 +146,10 @@
     ctx.fillText(customText, 0, 0);
 
     ctx.restore();
+  }
+
+  function drawImage() {
+
   }
 
   function updateTexture(texture) {
