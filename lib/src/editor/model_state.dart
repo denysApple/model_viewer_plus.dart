@@ -16,6 +16,7 @@ class ModelState {
     this.textY,
     this.textureType,
     this.rotation,
+    this.imageSrc,
   });
 
   final String? customText;
@@ -26,6 +27,7 @@ class ModelState {
   final int? textY;
   final TextureType? textureType;
   final int? rotation;
+  final String? imageSrc;
 
   ModelState copyWith({
     String? customText,
@@ -36,6 +38,7 @@ class ModelState {
     int? textX,
     int? textY,
     int? rotation,
+    String? imageSrc,
   }) =>
       ModelState(
         customText: customText ?? this.customText,
@@ -46,5 +49,6 @@ class ModelState {
         textX: textX ?? this.textX,
         textY: textY ?? this.textY,
         rotation: rotation ?? this.rotation,
+        imageSrc: imageSrc ?? this.imageSrc,
       );
 }

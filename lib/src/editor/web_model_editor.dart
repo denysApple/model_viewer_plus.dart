@@ -16,16 +16,13 @@ external void updateCanvasTexture1(
   int? textY,
   String? texture,
   int? rotation,
+  String? imageSrc,
 );
 
 @JS()
 external void toggleControlsVisibility();
 
 class WebModelEditor {
-  void toggleControls() {
-    toggleControlsVisibility();
-  }
-
   void updateState(ModelState state) {
     updateCanvasTexture1(
       state.customText,
@@ -39,6 +36,7 @@ class WebModelEditor {
         _ => "none",
       },
       state.rotation,
+      state.imageSrc,
     );
   }
 }
