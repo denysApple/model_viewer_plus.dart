@@ -59,9 +59,15 @@
         ctx.save();
         const dX = canvasSize / 2;
         const dY = canvasSize / 2;
-        const startX = 0;
-        const startY = 0;
-        ctx.drawImage(image, startX, startY, defaultImageWidth, defaultImageHeight);
+        const startX = 100;
+        const startY = 100;
+        ctx.translate(
+          60,
+          96 * (canvas.height / 512)
+        );
+        // ctx.translate(dX, dY);
+        ctx.scale(1, -1);
+        ctx.drawImage(image, 0, 0, defaultImageWidth, defaultImageHeight);
         ctx.restore();
 
         if (customText != null) {
