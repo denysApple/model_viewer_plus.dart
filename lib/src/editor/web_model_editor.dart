@@ -22,6 +22,9 @@ external void updateCanvasTexture1(
 @JS()
 external void toggleControlsVisibility();
 
+@JS()
+external void exportGLB();
+
 class WebModelEditor {
   void updateState(ModelState state) {
     updateCanvasTexture1(
@@ -38,5 +41,9 @@ class WebModelEditor {
       state.rotation,
       state.imageSrc,
     );
+  }
+
+  void export() {
+    exportGLB();
   }
 }

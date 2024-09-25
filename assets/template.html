@@ -219,6 +219,7 @@
   }
 
   // Function to adjust the canvas resolution dynamically
+  // most of this is hardcoded because no time for better investigation
   function adjustCanvasResolution() {
     const canvas = canvasTexture.source.element;
 
@@ -258,6 +259,41 @@
       // DOM is ready, call the function directly
       initializeModelViewer();
     }
+  }
+
+  async function exportGLB(){
+    const modelViewer = document.getElementById("modelViewer");
+    const glTF = await modelViewer.exportScene();
+    // create filename based on current datetime
+    const filename = `export-${new Date().toISOString().replace(/:/g, "-")}.glb`;
+    const file = new File([glTF], filename);
+    try {
+      sendFileToDart(file);
+    } catch (error) {
+      console.error("Error exporting model:", error);
+      const link = document.createElement("a");
+      link.download =file.name;
+      link.href = URL.createObjectURL(file);
+      link.click();
+    }
+    console.log("Exported model");
+  }
+
+  function sendFileToDart(file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const base64data = event.target.result.split(',')[1]; // Remove data URL prefix
+      const fileData = {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        lastModified: file.lastModified,
+        content: base64data
+      };
+      // Assuming you're using flutter_inappwebview
+      ExportModel.postMessage(JSON.stringify(fileData));
+    };
+    reader.readAsDataURL(file);
   }
 
   // Call tryInitialize immediately

@@ -24,6 +24,7 @@ class ModelViewerState extends State<ModelViewer> {
     if (store == null) return;
     _subscriptions.addAll([
       store.state.listen((newState) => _editor.updateState(newState)),
+      store.exportClicks.listen((_) => _editor.export()),
     ]);
   }
 

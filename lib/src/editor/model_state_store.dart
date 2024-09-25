@@ -6,7 +6,9 @@ import 'model_state.dart';
 
 class ModelStateStore {
   final _stateController = BehaviorSubject<ModelState>();
+  final _exportClicks = PublishSubject<bool>();
   Stream<ModelState> get state => _stateController.stream;
+  Stream<bool> get exportClicks => _exportClicks.stream;
 
   void updateState(
     ModelState Function(ModelState) producer,
@@ -18,5 +20,9 @@ class ModelStateStore {
 
   void dispose() {
     _stateController.close();
+  }
+
+  void export() {
+    _exportClicks.sink.add(true);
   }
 }

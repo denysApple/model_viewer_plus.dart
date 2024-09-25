@@ -38,4 +38,8 @@ class MobileModelEditor {
     print("js: $jsMethod");
     _controller.runJavaScript(jsMethod);
   }
+
+  void export() {
+    _controller.runJavaScript("exportGLB()");
+  }
 }
