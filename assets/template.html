@@ -20,6 +20,8 @@
   let textColorDefault = "#000000";
   const defaultImageWidth = 100;
   const defaultImageHeight = 100;
+
+  const canvasSize = 1024;
   const imageId = "image-print";
 
   function getCanvasTexture() {
@@ -48,15 +50,17 @@
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (imageSrc) {
+      console.log("Image source provided");
       const image = new Image(defaultImageWidth, defaultImageHeight);
       // set image id
       image.id = imageId;
       image.onload = function() {
+        console.log("Image loaded");
         ctx.save();
-        const dX = 35 * (canvas.width / 512);
-        const dY = 86 * (canvas.height / 512);
-        const startX = dX - defaultImageWidth / 2;
-        const startY = dY - defaultImageHeight / 2;
+        const dX = canvasSize / 2;
+        const dY = canvasSize / 2;
+        const startX = 0;
+        const startY = 0;
         ctx.drawImage(image, startX, startY, defaultImageWidth, defaultImageHeight);
         ctx.restore();
 
@@ -87,6 +91,7 @@
       }
       image.src = imageSrc;
     } else {
+      console.log("No image source provided");
       if (customText != null) {
         drawText(canvas, customText, color, fontSize, textX, textY, rotation);
       }
@@ -227,8 +232,8 @@
 
     // Limit canvas size to a maximum value to prevent performance issues
     const maxCanvasSize = 2048; // Adjust as needed
-    canvas.width = 1024;
-    canvas.height = 1024;
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
 
     // Scale the context
     const ctx = canvas.getContext("2d");

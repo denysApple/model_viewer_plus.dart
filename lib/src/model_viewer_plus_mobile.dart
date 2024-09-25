@@ -256,6 +256,17 @@ class ModelViewerState extends State<ModelViewer> {
             ..headers.add('Content-Length', html.length.toString())
             ..add(html);
           await response.close();
+        case 'model-editor.js':
+          final code = await _readAsset(
+            'packages/model_viewer_plus/assets/model-editor.js',
+          );
+          response
+            ..statusCode = HttpStatus.ok
+            ..headers
+                .add('Content-Type', 'application/javascript;charset=UTF-8')
+            ..headers.add('Content-Length', code.lengthInBytes.toString())
+            ..add(code);
+          await response.close();
         case '/model-viewer.min.js':
           final code = await _readAsset(
             'packages/model_viewer_plus/assets/model-viewer.min.js',
