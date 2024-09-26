@@ -313,6 +313,10 @@
   }
 
   function sendFileToDart(file) {
+    if (ExportModel) {
+      // TODO: 
+      console.log('Sending file to Dart');
+    }
     const reader = new FileReader();
     reader.onload = function (event) {
       const base64data = event.target.result.split(',')[1]; // Remove data URL prefix
