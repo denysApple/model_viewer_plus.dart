@@ -43,7 +43,10 @@
     textY,
     texture,
     rotation,
-    imageSrc
+    imageSrc,
+    imageRotation,
+    imageX,
+    imageY
   ) {
     pendingCanvasUpdate = {
       customText,
@@ -54,12 +57,15 @@
       textY,
       texture,
       rotation,
-      imageSrc
+      imageSrc,
+      imageRotation,
+      imageX,
+      imageY
     };
-    requestAnimationFrame(realUpdate);
+    requestAnimationFrame(updateModel);
   }
 
-  function realUpdate() {
+  function updateModel() {
     if (!pendingCanvasUpdate) return;
 
     const {
@@ -71,14 +77,22 @@
       textY,
       texture,
       rotation,
-      imageSrc
+      imageSrc,
+      imageRotation,
+      imageX,
+      imageY
     } = pendingCanvasUpdate;
 
     pendingCanvasUpdate = null;
 
     const canvas = canvasTexture ? canvasTexture.source.element : document.createElement('canvas');
+    const offscreenCanvas = canvas.offscreenCanvas;
     const ctx = canvas.getContext('2d');
     console.log("offscreen canvas: ", canvas.offscreenCanvas);
+    // log image rotation, x and y
+    console.log("Image rotation: ", imageRotation);
+    console.log("Image x: ", imageX);
+    console.log("Image y: ", imageY);
 
     ctx.fillStyle = backgroundColor || bgColorDefault;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -90,16 +104,27 @@
       image.onload = function () {
         console.log("Image loaded");
         ctx.save();
-        const dX = canvasSize / 2;
-        const dY = canvasSize / 2;
-        const startX = 100;
-        const startY = 100;
-        ctx.translate(
-          60,
-          96 * (canvas.height / 512)
-        );
+        // Calculate the center point of the image
+        const centerX = 60 + (imageX || 0) + defaultImageWidth / 2;
+        const centerY = 96 * (canvas.height / 512) + (imageY || 0);
+
+        // Translate to the center of the image
+        ctx.translate(centerX, centerY);
+
+        // Rotate around this center point
+        ctx.rotate((imageRotation || 0) * Math.PI / 180);
+
+        // Scale to flip vertically (if needed)
         ctx.scale(1, -1);
-        ctx.drawImage(image, 0, 0, defaultImageWidth, defaultImageHeight);
+
+        // Draw the image centered on this point
+        ctx.drawImage(
+          image,
+          -defaultImageWidth / 2,
+          -defaultImageHeight / 2,
+          defaultImageWidth,
+          defaultImageHeight
+        );
         ctx.restore();
 
         if (customText != null) {

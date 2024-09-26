@@ -17,6 +17,9 @@ external void updateCanvasTexture1(
   String? texture,
   int? rotation,
   String? imageSrc,
+  int? imageRotation,
+  int? imageX,
+  int? imageY,
 );
 
 @JS()
@@ -40,6 +43,9 @@ class WebModelEditor {
       },
       state.rotation,
       state.imageSrc,
+      state.imageRotation,
+      state.imageX,
+      state.imageY,
     );
   }
 

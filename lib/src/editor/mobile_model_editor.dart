@@ -22,6 +22,9 @@ class MobileModelEditor {
     };
     final rotation = state.rotation;
     final imageSrc = state.imageSrc != null ? '"${state.imageSrc}"' : null;
+    final imageRotation = state.imageRotation;
+    final imageX = state.imageX;
+    final imageY = state.imageY;
     final jsMethod = """
     updateCanvasTexture1(
     "${customText ?? ''}",
@@ -32,7 +35,10 @@ class MobileModelEditor {
     $textY,
     $texture,
     $rotation, 
-    $imageSrc
+    $imageSrc,
+    $imageRotation,
+    $imageX,
+    $imageY
     )
     """;
     print("js: $jsMethod");
