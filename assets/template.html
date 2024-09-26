@@ -1,21 +1,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-    body,
-    model-viewer {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
+  body,
+  model-viewer {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 </style>
 <script type="module" src="model-viewer.min.js" defer></script>
 <!-- body -->
 
 <script>
   let canvasTexture = null;
-  let originalTexture = null; // Variable to store the original texture
   let modelViewer = null;
-  
+
   let bgColorDefault = "#ffffff";
   let textColorDefault = "#000000";
   const defaultImageWidth = 100;
@@ -23,6 +22,9 @@
 
   const canvasSize = 1024;
   const imageId = "image-print";
+
+  let pendingCanvasUpdate = null;
+
 
   function getCanvasTexture() {
     if (canvasTexture) return canvasTexture;
@@ -43,8 +45,40 @@
     rotation,
     imageSrc
   ) {
+    pendingCanvasUpdate = {
+      customText,
+      color,
+      backgroundColor,
+      fontSize,
+      textX,
+      textY,
+      texture,
+      rotation,
+      imageSrc
+    };
+    requestAnimationFrame(realUpdate);
+  }
+
+  function realUpdate() {
+    if (!pendingCanvasUpdate) return;
+
+    const {
+      customText,
+      color,
+      backgroundColor,
+      fontSize,
+      textX,
+      textY,
+      texture,
+      rotation,
+      imageSrc
+    } = pendingCanvasUpdate;
+
+    pendingCanvasUpdate = null;
+
     const canvas = canvasTexture ? canvasTexture.source.element : document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    console.log("offscreen canvas: ", canvas.offscreenCanvas);
 
     ctx.fillStyle = backgroundColor || bgColorDefault;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -53,8 +87,7 @@
       console.log("Image source provided");
       const image = new Image(defaultImageWidth, defaultImageHeight);
       // set image id
-      image.id = imageId;
-      image.onload = function() {
+      image.onload = function () {
         console.log("Image loaded");
         ctx.save();
         const dX = canvasSize / 2;
@@ -65,7 +98,6 @@
           60,
           96 * (canvas.height / 512)
         );
-        // ctx.translate(dX, dY);
         ctx.scale(1, -1);
         ctx.drawImage(image, 0, 0, defaultImageWidth, defaultImageHeight);
         ctx.restore();
@@ -80,9 +112,8 @@
           console.log("Updating canvas texture source 1");
           canvasTexture.source.update();
         }
-
       }
-      image.onerror = function() {
+      image.onerror = function () {
         console.error("Image load error");
         if (customText != null) {
           drawText(canvas, customText, color, fontSize, textX, textY, rotation);
@@ -96,19 +127,19 @@
         }
       }
       image.src = imageSrc;
-    } else {
-      console.log("No image source provided");
-      if (customText != null) {
-        drawText(canvas, customText, color, fontSize, textX, textY, rotation);
-      }
-
-      if (texture) updateTexture(texture);
-
-      if (canvasTexture) {
-        console.log("Updating canvas texture source 1");
-        canvasTexture.source.update();
-      }
     }
+    console.log("drawing text if required");
+    if (customText != null) {
+      drawText(canvas, customText, color, fontSize, textX, textY, rotation);
+    }
+
+    if (texture) updateTexture(texture);
+
+    if (canvasTexture) {
+      console.log("Updating canvas texture source 1");
+      canvasTexture.source.update();
+    }
+
   }
 
   function drawText(canvas, customText, color, fontSize, textX, textY, rotation) {
@@ -159,19 +190,9 @@
     ctx.restore();
   }
 
-  function drawImage() {
-
-  }
-
   function updateTexture(texture) {
     const material = modelViewer.model.materials[0];
-    const { baseColorTexture } = material.pbrMetallicRoughness;
-
-    // Store the original texture
-    if (originalTexture === null) {
-      console.log("keep original texture");
-      originalTexture = baseColorTexture;
-    }
+    const {baseColorTexture} = material.pbrMetallicRoughness;
 
     console.log("Texture type changed to:", texture);
     switch (texture) {
@@ -182,7 +203,6 @@
         baseColorTexture.setTexture(getCanvasTexture());
         break;
     }
-
   }
 
   function initializeModelViewer() {
@@ -201,16 +221,16 @@
     modelViewer.addEventListener("load", async () => {
       console.log("Model viewer loaded");
       const material = modelViewer.model.materials[0];
-      const { baseColorTexture } = material.pbrMetallicRoughness;
-
-      // Store the original texture
-      originalTexture = baseColorTexture;
 
       // Initialize canvas texture
       canvasTexture = modelViewer.createCanvasTexture();
 
+      const offscreenCanvas = document.createElement('canvas');
+      adjustCanvasResolution(offscreenCanvas);
+      canvasTexture.source.element.offscreenCanvas = offscreenCanvas;
 
-      adjustCanvasResolution();
+
+      adjustCanvasResolution(canvasTexture.source.element);
     });
 
     modelViewer.addEventListener("error", (error) => {
@@ -220,25 +240,13 @@
 
   // Function to adjust the canvas resolution dynamically
   // most of this is hardcoded because no time for better investigation
-  function adjustCanvasResolution() {
-    const canvas = canvasTexture.source.element;
+  function adjustCanvasResolution(canvas) {
 
     // Define a base size (e.g., 512x512)
     const baseSize = 512;
 
-    // Get device pixel ratio
     const ratio = 3;
 
-    // Optionally, get the original texture size
-    const originalTextureWidth = originalTexture.texture.source.width;
-    const originalTextureHeight = originalTexture.texture.source.height;
-
-    // Set canvas dimensions
-    // canvas.width = baseSize * ratio;
-    // canvas.height = baseSize * ratio;
-
-    // Limit canvas size to a maximum value to prevent performance issues
-    const maxCanvasSize = 2048; // Adjust as needed
     canvas.width = canvasSize;
     canvas.height = canvasSize;
 
@@ -249,7 +257,7 @@
     console.log(`Canvas size set to ${canvas.width}x${canvas.height}`);
   }
 
-  
+
   // This function will attempt to initialize as soon as possible
   function tryInitialize() {
     if (document.readyState === 'loading') {
@@ -261,7 +269,7 @@
     }
   }
 
-  async function exportGLB(){
+  async function exportGLB() {
     const modelViewer = document.getElementById("modelViewer");
     const glTF = await modelViewer.exportScene();
     // create filename based on current datetime
@@ -272,7 +280,7 @@
     } catch (error) {
       console.error("Error exporting model:", error);
       const link = document.createElement("a");
-      link.download =file.name;
+      link.download = file.name;
       link.href = URL.createObjectURL(file);
       link.click();
     }
@@ -281,7 +289,7 @@
 
   function sendFileToDart(file) {
     const reader = new FileReader();
-    reader.onload = function(event) {
+    reader.onload = function (event) {
       const base64data = event.target.result.split(',')[1]; // Remove data URL prefix
       const fileData = {
         name: file.name,
