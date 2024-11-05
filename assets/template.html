@@ -13,7 +13,12 @@
 
 <script>
   let canvasTexture = null;
-  let modelViewer = null;
+
+  // always call this in the code,
+  // because we want to get the original one everytime
+  function getModelViewer() {
+    return document.getElementById('modelViewer');
+  }
 
   let bgColorDefault = "#ffffff";
   let textColorDefault = "#000000";
@@ -29,6 +34,7 @@
   function getCanvasTexture() {
     if (canvasTexture) return canvasTexture;
     console.log("Creating new canvas texture");
+    const modelViewer = getModelViewer();
     canvasTexture = modelViewer.createCanvasTexture();
     updateCanvasTexture1();
     return canvasTexture;
@@ -216,6 +222,7 @@
   }
 
   function updateTexture(texture) {
+    const modelViewer = getModelViewer();
     const material = modelViewer.model.materials[0];
     const {baseColorTexture} = material.pbrMetallicRoughness;
 
@@ -233,7 +240,9 @@
   function initializeModelViewer() {
     console.log("Initializing Model Viewer");
 
-    modelViewer = document.getElementById('modelViewer');
+    canvasTexture = null; // resetting canvas texture here every time we open a new model
+
+    const modelViewer = getModelViewer();
 
     if (!modelViewer) {
       console.error("Model viewer element not found");
@@ -295,8 +304,9 @@
   }
 
   async function exportGLB() {
-    const modelViewer = document.getElementById("modelViewer");
+    const modelViewer = getModelViewer();
     const glTF = await modelViewer.exportScene();
+
     // create filename based on current datetime
     const filename = `export-${new Date().toISOString().replace(/:/g, "-")}.glb`;
     const file = new File([glTF], filename);
