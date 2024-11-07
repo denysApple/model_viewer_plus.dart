@@ -48,4 +48,9 @@ class MobileModelEditor {
   void export() {
     _controller.runJavaScript("exportGLB()");
   }
+
+  void save() {
+    print('save button in mobile_modle_editor');
+    _controller.runJavaScript("saveGLB()");
+  }
 }

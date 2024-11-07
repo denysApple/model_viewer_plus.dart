@@ -28,6 +28,9 @@ external void toggleControlsVisibility();
 @JS()
 external void exportGLB();
 
+@JS()
+external void saveGLB();
+
 class WebModelEditor {
   void updateState(ModelState state) {
     updateCanvasTexture1(
@@ -51,5 +54,9 @@ class WebModelEditor {
 
   void export() {
     exportGLB();
+  }
+
+  void save() {
+    saveGLB();
   }
 }

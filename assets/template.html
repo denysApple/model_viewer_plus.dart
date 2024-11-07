@@ -303,6 +303,10 @@
     }
   }
 
+  function saveGLB() {
+    console.log("Save button clicked");
+  }
+
   async function exportGLB() {
     const modelViewer = getModelViewer();
     const glTF = await modelViewer.exportScene();
