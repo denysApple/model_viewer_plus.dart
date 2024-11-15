@@ -14,12 +14,6 @@
 <script>
   let canvasTexture = null;
 
-  // always call this in the code,
-  // because we want to get the original one everytime
-  function getModelViewer() {
-    return document.getElementById('modelViewer');
-  }
-
   let bgColorDefault = "#ffffff";
   let textColorDefault = "#000000";
   const defaultImageWidth = 100;
@@ -197,7 +191,7 @@
       posY + 86 * (canvas.height / 512)
     );
 
-    //flip vertically 
+    //flip vertically
     ctx.scale(1, -1);
 
     // Apply rotation
@@ -238,6 +232,7 @@
   }
 
   function initializeModelViewer() {
+    onModelLoadStarted();
     console.log("Initializing Model Viewer");
 
     canvasTexture = null; // resetting canvas texture here every time we open a new model
@@ -265,6 +260,7 @@
 
 
       adjustCanvasResolution(canvasTexture.source.element);
+      onModelLoaded();
     });
 
     modelViewer.addEventListener("error", (error) => {
@@ -303,49 +299,98 @@
     }
   }
 
-  function saveGLB() {
-    console.log("Save button clicked");
+   function onModelLoaded() {
+  if (typeof ModelLoaded !== 'undefined' && ModelLoaded.postMessage) {
+      // For mobile platforms
+      console.log('Model Loaded on Mobile');
+      ModelLoaded.postMessage("model_loaded");
+    } else if (window.ModelLoaded) {
+      // For web platforms
+      console.log('ModelLoaded on WEB');
+      window.ModelLoaded("model_loaded");
+    } else {
+      console.error('ModelLoaded is not defined');
+    }
   }
 
-  async function exportGLB() {
-    const modelViewer = getModelViewer();
-    const glTF = await modelViewer.exportScene();
+  function onModelLoadStarted() {
+  if (typeof ModelLoadedStarted !== 'undefined' && ModelLoadedStarted.postMessage) {
+      // For mobile platforms
+      console.log('Model Load Started on Mobile');
+      ModelLoadedStarted.postMessage("model_load_started");
+    } else if (window.ModelLoadedStarted) {
+      // For web platforms
+      console.log('ModelLoaded on WEB');
+      window.ModelLoadedStarted("model_load_started");
+    } else {
+      console.error('ModelLoadedStarted is not defined');
+    }
+  }
 
-    // create filename based on current datetime
-    const filename = `export-${new Date().toISOString().replace(/:/g, "-")}.glb`;
-    const file = new File([glTF], filename);
-    try {
-      sendFileToDart(file);
-    } catch (error) {
-      console.error("Error exporting model:", error);
+  // Attach saveGLB to the window object
+window.saveGLB = function () {
+  console.log("Save button clicked");
+};
+
+// Attach exportGLB to the window object
+window.exportGLB = async function () {
+  const modelViewer = getModelViewer();
+  const glTF = await modelViewer.exportScene();
+
+  // Create filename based on current datetime
+  const filename = `export-${new Date().toISOString().replace(/:/g, "-")}.glb`;
+  const file = new File([glTF], filename);
+  try {
+    await sendFileToDart(file);
+    console.log("Exported model and sent to Dart");
+  } catch (error) {
+    console.error("Error exporting model:", error);
+    // Fallback to downloading the file
+    const link = document.createElement("a");
+    link.download = file.name;
+    link.href = URL.createObjectURL(file);
+    link.click();
+  }
+};
+
+// Ensure getModelViewer is globally accessible
+function getModelViewer() {
+  return document.getElementById('modelViewer');
+}
+
+// Make sendFileToDart globally accessible if needed
+async function sendFileToDart(file) {
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    const base64data = event.target.result.split(',')[1]; // Remove data URL prefix
+    const fileData = {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      lastModified: file.lastModified,
+      content: base64data
+    };
+    const fileDataJson = JSON.stringify(fileData);
+
+    if (typeof ExportModel !== 'undefined' && ExportModel.postMessage) {
+      // For mobile platforms
+      console.log('Sending file to Dart via ExportModel.postMessage');
+      ExportModel.postMessage(fileDataJson);
+    } else if (window.ExportModel) {
+      // For web platforms
+      console.log('Sending file to Dart via window.ExportModel');
+      window.ExportModel(fileDataJson);
+    } else {
+      console.error('ExportModel is not defined');
+      // Fallback to downloading the file
       const link = document.createElement("a");
       link.download = file.name;
       link.href = URL.createObjectURL(file);
       link.click();
     }
-    console.log("Exported model");
-  }
-
-  function sendFileToDart(file) {
-    if (ExportModel) {
-      // TODO: 
-      console.log('Sending file to Dart');
-    }
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      const base64data = event.target.result.split(',')[1]; // Remove data URL prefix
-      const fileData = {
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        lastModified: file.lastModified,
-        content: base64data
-      };
-      // Assuming you're using flutter_inappwebview
-      ExportModel.postMessage(JSON.stringify(fileData));
-    };
-    reader.readAsDataURL(file);
-  }
+  };
+  reader.readAsDataURL(file);
+}
 
   // Call tryInitialize immediately
   tryInitialize();
