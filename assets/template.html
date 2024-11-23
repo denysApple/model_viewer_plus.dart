@@ -24,7 +24,6 @@
 
     let pendingCanvasUpdate = null;
 
-
     function getCanvasTexture() {
       if (canvasTexture) return canvasTexture;
       console.log("Creating new canvas texture");
@@ -417,10 +416,19 @@
         // For mobile platforms
         console.log('Sending file to Dart via ExportModel.postMessage');
         ExportModel.postMessage(fileDataJson);
-      } else if (window.ExportModel) {
-        // For web platforms
-        console.log('Sending file to Dart via window.ExportModel');
-        window.ExportModel(fileDataJson);
+      } else if (typeof window.ModelSaved !== 'undefined') {
+          console.log('Model Loaded on Web');
+          const event = new CustomEvent('ModelSaved', { detail: fileDataJson });
+          window.dispatchEvent(event);
+
+          if (action == "export") {
+          console.error('ExportModel is not defined');
+            // Fallback to downloading the file
+            const link = document.createElement("a");
+            link.download = file.name;
+            link.href = URL.createObjectURL(file);
+            link.click();
+          }
       } else {
         console.error('ExportModel is not defined');
         // Fallback to downloading the file
