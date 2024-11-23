@@ -34,7 +34,7 @@
       return canvasTexture;
     }
 
-    function updateCanvasTexture1(
+    window.updateCanvasTexture1 = async function (
       customText,
       color,
       backgroundColor,
@@ -303,6 +303,7 @@
   // Define ModelLoaded and ModelLoadedStarted explicitly on the window object
   window.ModelLoaded = window.ModelLoaded || {};
   window.ModelLoadStarted = window.ModelLoadStarted || {};
+  window.ModelSaved = window.ModelSaved || {};
 
   function onModelLoadStarted() {
     try {
@@ -348,10 +349,28 @@
     }
   }
 
-    // Attach saveGLB to the window object
-  window.saveGLB = function () {
-    console.log("Save button clicked");
-  };
+      // Attach saveGLB to the window object
+    window.saveGLB = async function () {
+      console.log("Save button clicked");
+
+      const modelViewer = getModelViewer();
+      const glTF = await modelViewer.exportScene();
+
+      // Create filename based on current datetime
+      const filename = `save-${new Date().toISOString().replace(/:/g, "-")}.glb`;
+      const file = new File([glTF], filename);
+      try {
+        await sendFileToDart(file, "save");
+        console.log("Saved model and sent to Dart");
+      } catch (error) {
+        console.error("Error saving model:", error);
+        // Fallback to downloading the file
+        const link = document.createElement("a");
+        link.download = file.name;
+        link.href = URL.createObjectURL(file);
+        link.click();
+      }
+    };
 
   // Attach exportGLB to the window object
   window.exportGLB = async function () {
@@ -362,7 +381,7 @@
     const filename = `export-${new Date().toISOString().replace(/:/g, "-")}.glb`;
     const file = new File([glTF], filename);
     try {
-      await sendFileToDart(file);
+      await sendFileToDart(file, "export");
       console.log("Exported model and sent to Dart");
     } catch (error) {
       console.error("Error exporting model:", error);
@@ -380,7 +399,7 @@
   }
 
   // Make sendFileToDart globally accessible if needed
-  async function sendFileToDart(file) {
+  async function sendFileToDart(file, action) {
     const reader = new FileReader();
     reader.onload = function (event) {
       const base64data = event.target.result.split(',')[1]; // Remove data URL prefix
@@ -389,7 +408,8 @@
         type: file.type,
         size: file.size,
         lastModified: file.lastModified,
-        content: base64data
+        content: base64data,
+        action: action
       };
       const fileDataJson = JSON.stringify(fileData);
 
