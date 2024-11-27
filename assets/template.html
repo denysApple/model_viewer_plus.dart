@@ -6,6 +6,9 @@
       height: 100%;
       margin: 0;
       padding: 0;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
 </style>
 <script type="module" src="model-viewer.min.js" defer></script>
@@ -23,6 +26,18 @@
     const imageId = "image-print";
 
     let pendingCanvasUpdate = null;
+
+   document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+    });
+
+    document.addEventListener('selectstart', (event) => {
+        event.preventDefault();
+    });
+
+    document.body.style.setProperty('-webkit-touch-callout', 'none');
+});
 
     function getCanvasTexture() {
       if (canvasTexture) return canvasTexture;
