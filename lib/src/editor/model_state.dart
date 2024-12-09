@@ -20,6 +20,9 @@ class ModelState {
     this.imageRotation,
     this.imageX,
     this.imageY,
+    this.imageScale, // Added for resizing
+    this.imageWidth, // Added to store original width
+    this.imageHeight, // Added to store original height
   });
 
   final String? customText;
@@ -34,6 +37,10 @@ class ModelState {
   final int? imageRotation;
   final int? imageX;
   final int? imageY;
+  final double? imageScale; // Added for resizing
+  final double? imageWidth; // Added to store original width
+  final double? imageHeight; // Added to store original height
+
 
   ModelState copyWith({
     String? customText,
@@ -48,6 +55,9 @@ class ModelState {
     int? imageRotation,
     int? imageX,
     int? imageY,
+    double? imageScale,
+    double? imageWidth,
+    double? imageHeight,
   }) =>
       ModelState(
         customText: customText ?? this.customText,
@@ -62,5 +72,8 @@ class ModelState {
         imageRotation: imageRotation ?? this.imageRotation,
         imageX: imageX ?? this.imageX,
         imageY: imageY ?? this.imageY,
+        imageScale: imageScale ?? this.imageScale,
+        imageWidth: imageWidth ?? this.imageWidth,
+        imageHeight: imageHeight ?? this.imageHeight,
       );
 }

@@ -25,6 +25,10 @@ class MobileModelEditor {
     final imageRotation = state.imageRotation;
     final imageX = state.imageX;
     final imageY = state.imageY;
+    final imageWidth = state.imageWidth;
+    final imageHeight = state.imageHeight;
+    final imageScale = state.imageScale;
+
     final jsMethod = """
     updateCanvasTexture1(
     "${customText ?? ''}",
@@ -38,7 +42,10 @@ class MobileModelEditor {
     $imageSrc,
     $imageRotation,
     $imageX,
-    $imageY
+    $imageY,
+    $imageWidth,
+    $imageHeight,
+    $imageScale
     )
     """;
     print("js: $jsMethod");
@@ -50,7 +57,7 @@ class MobileModelEditor {
   }
 
   void save() {
-    print('save button in mobile_modle_editor');
+    print('save button in mobile_model_editor');
     _controller.runJavaScript("saveGLB()");
   }
 }

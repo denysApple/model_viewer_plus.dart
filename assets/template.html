@@ -60,7 +60,10 @@
       imageSrc,
       imageRotation,
       imageX,
-      imageY
+      imageY,
+      imageWidth,
+      imageHeight,
+      scale
     ) {
       pendingCanvasUpdate = {
         customText,
@@ -74,7 +77,10 @@
         imageSrc,
         imageRotation,
         imageX,
-        imageY
+        imageY,
+        imageWidth,
+        imageHeight,
+        scale: scale || 1.0, // Default scale, todo: remove magic constant
       };
       requestAnimationFrame(updateModel);
     }
@@ -94,7 +100,10 @@
         imageSrc,
         imageRotation,
         imageX,
-        imageY
+        imageY,
+        imageWidth,
+        imageHeight,
+        scale,
       } = pendingCanvasUpdate;
 
       pendingCanvasUpdate = null;
@@ -116,8 +125,13 @@
         const image = new Image(defaultImageWidth, defaultImageHeight);
         // set image id
         image.onload = function () {
-          console.log("Image loaded");
+          console.log("Image loaded, with scale:", scale);
           ctx.save();
+
+          // Scale the image
+          const scaledWidth = (imageWidth || defaultImageWidth) * scale;
+          const scaledHeight = (imageHeight || defaultImageHeight) * scale;
+
           // Calculate the center point of the image
           const centerX = 60 + (imageX || 0) + defaultImageWidth / 2;
           const centerY = 96 * (canvas.height / 512) + (imageY || 0);
@@ -134,10 +148,10 @@
           // Draw the image centered on this point
           ctx.drawImage(
             image,
-            -defaultImageWidth / 2,
-            -defaultImageHeight / 2,
-            defaultImageWidth,
-            defaultImageHeight
+            -scaledWidth / 2,
+            -scaledHeight / 2,
+            scaledWidth,
+            scaledHeight
           );
           ctx.restore();
 

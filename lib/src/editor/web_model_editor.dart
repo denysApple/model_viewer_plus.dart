@@ -8,19 +8,21 @@ import '../util/hex_color.dart';
 
 @JS()
 external void updateCanvasTexture1(
-  String? customText,
-  String? color,
-  String? backgroundColor,
-  int? fontSize,
-  int? textX,
-  int? textY,
-  String? texture,
-  int? rotation,
-  String? imageSrc,
-  int? imageRotation,
-  int? imageX,
-  int? imageY,
-);
+    String? customText,
+    String? color,
+    String? backgroundColor,
+    int? fontSize,
+    int? textX,
+    int? textY,
+    String? texture,
+    int? rotation,
+    String? imageSrc,
+    int? imageRotation,
+    int? imageX,
+    int? imageY,
+    double? imageWidth,
+    double? imageHeight,
+    double? scale);
 
 @JS()
 external void toggleControlsVisibility();
@@ -49,6 +51,9 @@ class WebModelEditor {
       state.imageRotation,
       state.imageX,
       state.imageY,
+      state.imageWidth,
+      state.imageHeight,
+      state.imageScale
     );
   }
 
